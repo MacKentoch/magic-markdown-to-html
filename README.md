@@ -1,4 +1,4 @@
-# electron-react-file-management
+# Magic markdown to html
 
 electron react app based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
