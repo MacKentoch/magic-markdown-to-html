@@ -69,8 +69,10 @@ class Home extends Component {
             flexDirection: 'column',
             alignItems: 'center'
           }}>
+          <h1>Magic markdown to HTML</h1>
           <button
-            className="btn btn-warning btn-block"
+            className="btn btn-warning"
+            style={{ width: '400px', marginTop: '120px' }}
             onClick={this.handlesSelectDirectory}>
             <span
               style={{
@@ -83,6 +85,7 @@ class Home extends Component {
         </div>
       );
     }
+
     return (
       <div
         style={{
