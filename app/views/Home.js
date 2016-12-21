@@ -2,6 +2,7 @@
 /* eslint react/jsx-closing-bracket-location:0 */
 /* eslint max-len:0 */
 /* eslint arrow-body-style:0 */
+/* eslint react/no-did-mount-set-state:0 */
 
 // @no-flow
 import React, { Component } from 'react';
@@ -21,7 +22,8 @@ class Home extends Component {
     mdFiles: [],
     isRendering: false,
     rootPath: '',
-    errorMessage: ''
+    errorMessage: '',
+    saveThisDirectory: true
   };
 
   componentDidMount() {
@@ -42,6 +44,10 @@ class Home extends Component {
       }
     );
 
+    if (this.hasPresistDirectory()) {
+      this.setState({ rootPath: this.getPersistDirectory() })
+    }
+
     // receiving an array of converted markdown into html:
     ipcRenderer.on('convertedIntoHtml', this.onConvertedIntoHtml);
     ipcRenderer.on('select-directory-reply', this.onDirectorySelected);
@@ -58,7 +64,8 @@ class Home extends Component {
       isRendering,
       mdFiles,
       rootPath,
-      errorMessage
+      errorMessage,
+      saveThisDirectory
     } = this.state;
 
     if (!rootPath || rootPath.length === 0) {
@@ -82,6 +89,18 @@ class Home extends Component {
               Select a directory
             </span>
           </button>
+          <div>
+            <div className="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={saveThisDirectory}
+                  onChange={this.handlesSelectSaveThisDirectory}
+                />
+                Remember this directory
+              </label>
+            </div>
+          </div>
         </div>
       );
     }
@@ -102,23 +121,56 @@ class Home extends Component {
           }}>
           <h1>Magic markdown to HTML</h1>
         </div>
-
         <div
           style={{
             display: 'flex',
             marginTop: '30px',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'stretch',
+            marginLeft: '40px',
+            marginRight: '40px'
           }}>
-          <h4>
-            <i>
-              Renders markdown from directory:
-            </i>
-          </h4>
-          <h5>
-            {rootPath}
-          </h5>
+
+          <div className="panel panel-default">
+            <div className="panel-heading">
+              <h3 className="panel-title">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    color: '#4A4A4A'
+                  }}>
+                  <b>
+                    Renders markdown from directory:
+                  </b>
+                  <button
+                    className="btn btn-warning"
+                    style={{ marginLeft: '30px' }}
+                    onClick={this.handlesDeleteDirectory}>
+                    <span
+                      style={{
+                        color: '#fff',
+                        fontWeight: 'bolder'
+                      }}>
+                      <i
+                        className="fa fa-trash-o"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </button>
+                </div>
+              </h3>
+            </div>
+            <div className="panel-body">
+              <h5 style={{ color: '#4A4A4A' }}>
+                {rootPath}
+              </h5>
+            </div>
+          </div>
         </div>
+        <hr />
         {
           errorMessage && errorMessage.length > 0 &&
             <div
@@ -310,6 +362,12 @@ class Home extends Component {
     );
   }
 
+  handlesSelectSaveThisDirectory = event => {
+    // event.preventDefault();
+    const { saveThisDirectory } = this.state;
+    this.setState({ saveThisDirectory: !saveThisDirectory });
+  }
+
   handlesSelectDirectory= (event) => {
     event.preventDefault();
     ipcRenderer.send('select-directory');
@@ -318,10 +376,41 @@ class Home extends Component {
   onDirectorySelected = (event, args) => {
     if (Array.isArray(args) && args.length > 0) {
       const directory = args[0];
-      console.log('directory: ', directory);
+      const { saveThisDirectory } = this.state;
+      if (saveThisDirectory === true) {
+        this.savePresistDirectory(directory);
+      }
+      // console.log('directory: ', directory);
       this.setState({ rootPath: directory });
     }
   }
+
+  handlesDeleteDirectory = event => {
+    event.preventDefault();
+    this.deletePresistDirectory();
+    this.setState({ rootPath: '' });
+  }
+
+  savePresistDirectory = (directory) => {
+    localStorage.setItem('rootDirectory', directory);
+  }
+
+  deletePresistDirectory = () => {
+    localStorage.removeItem('rootDirectory');
+  }
+
+  getPersistDirectory = () => {
+    return localStorage.getItem('rootDirectory');
+  }
+
+  hasPresistDirectory = () => {
+    const directory = this.getPersistDirectory();
+    if (directory) {
+      return true;
+    }
+    return false;
+  }
+
 
   onConvertedIntoHtml = (event, args) => {
     const listMdFiles = args;
