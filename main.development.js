@@ -1,14 +1,74 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell, ipcMain } from 'electron';
+import fs from 'fs';
+import { githubStyle } from './app/utils/gihubStyle';
+
+const marked = require('marked');
+
+const highlightJs = require('highlight.js');
+
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  highlight: (code) => highlightJs.highlightAuto(code).value
+});
+
+const showdown = require('showdown');
+
+const converter = new showdown.Converter();
+converter.setFlavor('github');
 
 let menu;
 let template;
 let mainWindow = null;
 
+ipcMain.on('convertHtml', (event, arg) => {
+  const listFiles = arg;
+  if (Array.isArray(listFiles)) {
+    const mdFiles = listFiles.map(
+      fichier => {
+        const file = fs.readFileSync(fichier, 'utf8');
+        const markedFile = marked(file.toString());
+        const mdFile = fichier.replace('.md', '.html');
+        fs.writeFileSync(mdFile,
+          `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              ${githubStyle}
+            <head>
+            <body class="markdown-body">
+              ${markedFile}
+            </body>
+          </html>
+          `
+        );
+        return mdFile;
+      }
+    );
+    event.sender.send('convertedIntoHtml', mdFiles);
+    return;
+  }
+  // somethings wrong => so returns an empty array:
+  event.sender.send('convertedIntoHtml', []);
+});
+
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support'); // eslint-disable-line
+  sourceMapSupport.install();
+}
 
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')(); // eslint-disable-line global-require
+  const path = require('path'); // eslint-disable-line
+  const p = path.join(__dirname, '..', 'app', 'node_modules'); // eslint-disable-line
+  require('module').globalPaths.push(p); // eslint-disable-line
 }
-
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
@@ -18,13 +78,15 @@ app.on('window-all-closed', () => {
 const installExtensions = async () => {
   if (process.env.NODE_ENV === 'development') {
     const installer = require('electron-devtools-installer'); // eslint-disable-line global-require
+
     const extensions = [
       'REACT_DEVELOPER_TOOLS',
       'REDUX_DEVTOOLS'
     ];
-    for (const name of extensions) {
+    const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+    for (const name of extensions) { // eslint-disable-line
       try {
-        await installer.default(installer[name]);
+        await installer.default(installer[name], forceDownload);
       } catch (e) {} // eslint-disable-line
     }
   }
@@ -35,8 +97,10 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728
+    width: 670,
+    height: 950,
+    resizable: process.env.NODE_ENV === 'development',
+    // nodeIntegration: false
   });
 
   mainWindow.loadURL(`file://${__dirname}/app/app.html`);
@@ -44,6 +108,8 @@ app.on('ready', async () => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
     mainWindow.focus();
+    // send showdown converter
+    mainWindow.webContents.send('mdConverter', showdown);
   });
 
   mainWindow.on('closed', () => {
