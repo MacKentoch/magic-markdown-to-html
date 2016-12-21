@@ -12,14 +12,15 @@ import cx from 'classnames';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
-const rootPath = path.resolve('../');
+const defaultRootPath = path.resolve('../');
 
 class Home extends Component {
   state = {
     isFetchingDirectories: true,
     files: [],
     mdFiles: [],
-    isRendering: false
+    isRendering: false,
+    rootPath: defaultRootPath
   };
 
   componentDidMount() {
@@ -49,7 +50,8 @@ class Home extends Component {
       files,
       isFetchingDirectories,
       isRendering,
-      mdFiles
+      mdFiles,
+      rootPath
     } = this.state;
 
     return (
@@ -78,84 +80,119 @@ class Home extends Component {
           }}>
           {
             isRendering &&
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginTop: '20px',
-                marginBottom: '20px'
-              }}>
-              <h2 style={{ textAlign: 'center' }}>
-                rendering markdown files...
-              </h2>
-              <CubeGrid
-                style={{ marginTop: '20px' }}
-                size={46}
-                color="#f1f2f3"
-              />
-            </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  marginBottom: '20px'
+                }}>
+                <h2 style={{ textAlign: 'center' }}>
+                  rendering markdown files...
+                </h2>
+                <CubeGrid
+                  style={{ marginTop: '20px' }}
+                  size={46}
+                  color="#f1f2f3"
+                />
+              </div>
           }
 
           {
             !isRendering && Array.isArray(mdFiles) && mdFiles.length > 0 &&
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'column',
-                marginLeft: '5%',
-                marginRight: '5%'
-              }}>
-              <table className="table table-striped table-hover ">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Markdown file</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    mdFiles
-                    .map(markdown => markdown.replace(rootPath, ''))
-                    .map(
-                      (file, filesIdx) => (
-                        <tr key={filesIdx}>
-                          <td>{filesIdx}</td>
-                          <td>{file}</td>
-                        </tr>
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  marginLeft: '5%',
+                  marginRight: '5%'
+                }}>
+                <table className="table table-striped table-hover ">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Markdown file</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      mdFiles
+                      .map(markdown => markdown.replace(rootPath, ''))
+                      .map(
+                        (file, filesIdx) => (
+                          <tr key={filesIdx}>
+                            <td>{filesIdx}</td>
+                            <td>{file}</td>
+                          </tr>
+                        )
                       )
-                    )
-                  }
-                </tbody>
-              </table>
-            </div>
+                    }
+                  </tbody>
+                </table>
+              </div>
           }
 
           {
             !isRendering && isFetchingDirectories &&
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginTop: '20px',
-                marginBottom: '20px'
-              }}>
-              <h2 style={{ textAlign: 'center' }}>
-                Inspecting markdown files...
-              </h2>
-              <CubeGrid
-                style={{ marginTop: '20px' }}
-                size={46}
-                color="#f1f2f3"
-              />
-            </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  marginBottom: '20px'
+                }}>
+                <h2 style={{ textAlign: 'center' }}>
+                  Inspecting markdown files...
+                </h2>
+                <CubeGrid
+                  style={{ marginTop: '20px' }}
+                  size={46}
+                  color="#f1f2f3"
+                />
+              </div>
           }
           {
             !isRendering && mdFiles.length === 0 && !isFetchingDirectories && Array.isArray(files) && files.length > 0 &&
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  marginLeft: '5%',
+                  marginRight: '5%'
+                }}>
+                <table className="table table-striped table-hover ">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Markdown file</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      files
+                      .map(markdown => markdown.replace(rootPath, ''))
+                      .map(
+                        (file, filesIdx) => (
+                          <tr key={filesIdx}>
+                            <td>{filesIdx}</td>
+                            <td>{file}</td>
+                          </tr>
+                        )
+                      )
+                    }
+                  </tbody>
+                </table>
+              </div>
+          }
+        </div>
+        {
+          !isRendering && !isFetchingDirectories && mdFiles.length === 0 &&
             <div
               style={{
                 display: 'flex',
@@ -164,74 +201,39 @@ class Home extends Component {
                 marginLeft: '5%',
                 marginRight: '5%'
               }}>
-              <table className="table table-striped table-hover ">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Markdown file</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    files
-                    .map(markdown => markdown.replace(rootPath, ''))
-                    .map(
-                      (file, filesIdx) => (
-                        <tr key={filesIdx}>
-                          <td>{filesIdx}</td>
-                          <td>{file}</td>
-                        </tr>
-                      )
-                    )
-                  }
-                </tbody>
-              </table>
+              <button
+                className="btn btn-warning btn-block"
+                onClick={this.handlesOnClick}>
+                <span style={{ color: '#fff', fontWeight: 'bolder' }}>
+                  CONVERT ALL MD FILES TO HTML
+                </span>
+              </button>
             </div>
-          }
-        </div>
-        {
-          !isRendering && !isFetchingDirectories && mdFiles.length === 0 &&
-          <div
-            style={{
-              display: 'flex',
-              flex: 1,
-              flexDirection: 'column',
-              marginLeft: '5%',
-              marginRight: '5%'
-            }}>
-            <button
-              className="btn btn-warning btn-block"
-              onClick={this.handlesOnClick}>
-              <span style={{ color: '#fff', fontWeight: 'bolder' }}>
-                CONVERT ALL MD FILES TO HTML
-              </span>
-            </button>
-          </div>
         }
         {
           !isRendering && mdFiles.length > 0 &&
-          <div
-            style={{
-              display: 'flex',
-              flex: 1,
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}>
-            <h1>
-              <i
-                className={
-                cx({
-                  fa: true,
-                  'fa-thumbs-o-up': true,
-                  animated: true,
-                  zoomIn: true
-                })
-              } />
-            </h1>
-            <h2>
-              Done!
-            </h2>
-          </div>
+            <div
+              style={{
+                display: 'flex',
+                flex: 1,
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+              <h1>
+                <i
+                  className={
+                  cx({
+                    fa: true,
+                    'fa-thumbs-o-up': true,
+                    animated: true,
+                    zoomIn: true
+                  })
+                } />
+              </h1>
+              <h2>
+                Done!
+              </h2>
+            </div>
         }
       </div>
     );
@@ -254,6 +256,8 @@ class Home extends Component {
   }
 
   getListListFiles = () => {
+    const { rootPath } = this.state;
+
     return new Promise((resolve, reject) => {
       recursive(rootPath, (err, files) => {
         if (err) {
@@ -270,8 +274,6 @@ class Home extends Component {
   handlesOnClick = (event) => {
     event.preventDefault();
     const { files } = this.state;
-
-    console.log('files, ', files);
 
     if (Array.isArray(files) && files.length > 0) {
       this.setState({ isRendering: true });
