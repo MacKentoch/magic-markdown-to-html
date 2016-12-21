@@ -1,0 +1,18 @@
+{
+  "presets": ["es2015", "stage-0", "react"],
+  "plugins": ["add-module-exports"],
+  "env": {
+    "production": {
+      "presets": ["react-optimize"],
+      "plugins": ["babel-plugin-dev-expression", "transform-flow-strip-types"]
+    },
+    "development": {
+      "presets": ["react-hmre"]
+    },
+    "test": {
+      "plugins": [
+        ["webpack-loaders", { "config": "webpack.config.test.js", "verbose": false }]
+      ]
+    }
+  }
+}
