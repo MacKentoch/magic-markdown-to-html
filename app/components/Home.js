@@ -20,7 +20,8 @@ class Home extends Component {
     files: [],
     mdFiles: [],
     isRendering: false,
-    rootPath: defaultRootPath
+    rootPath: defaultRootPath,
+    errorMessage: 'test'
   };
 
   componentDidMount() {
@@ -34,7 +35,11 @@ class Home extends Component {
       }
     )
     .catch(
-      err => console.log(err)
+      err => {
+        return this.setState({
+          errorMessage: err.message
+        });
+      }
     );
 
     // receiving an array of converted markdown into html:
@@ -51,7 +56,8 @@ class Home extends Component {
       isFetchingDirectories,
       isRendering,
       mdFiles,
-      rootPath
+      rootPath,
+      errorMessage
     } = this.state;
 
     return (
@@ -74,9 +80,48 @@ class Home extends Component {
         <div
           style={{
             display: 'flex',
+            marginTop: '30px',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+          <h4>
+            <i>
+              Renders markdown from directory:
+            </i>
+          </h4>
+          <h5>
+            {rootPath}
+          </h5>
+        </div>
+        {
+          errorMessage && errorMessage.length > 0 &&
+            <div
+              style={{
+                display: 'flex',
+                marginTop: '20px',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+              <div
+                className="alert alert-dismissible alert-danger"
+                style={{ width: '500px' }}>
+                <button
+                  type="button"
+                  className="close"
+                  onClick={this.onErrorAlertClick}>
+                  &times;
+                </button>
+                <strong>Error: </strong>
+                {errorMessage}
+              </div>
+            </div>
+        }
+        <div
+          style={{
+            display: 'flex',
             flex: 1,
             flexDirection: 'column',
-            marginTop: '50px'
+            marginTop: '20px'
           }}>
           {
             isRendering &&
@@ -253,6 +298,11 @@ class Home extends Component {
 
     // all is ok:
     this.setState({ mdFiles: listMdFiles });
+  }
+
+  onErrorAlertClick = (event) => {
+    event.preventDefault();
+    this.setState({ errorMessage: '' });
   }
 
   getListListFiles = () => {
