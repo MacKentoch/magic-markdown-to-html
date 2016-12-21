@@ -12,7 +12,7 @@ import cx from 'classnames';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
-const defaultRootPath = path.resolve('../');
+// const defaultRootPath = path.resolve('../');
 
 class Home extends Component {
   state = {
@@ -20,7 +20,7 @@ class Home extends Component {
     files: [],
     mdFiles: [],
     isRendering: false,
-    rootPath: defaultRootPath,
+    rootPath: '',
     errorMessage: ''
   };
 
@@ -44,6 +44,7 @@ class Home extends Component {
 
     // receiving an array of converted markdown into html:
     ipcRenderer.on('convertedIntoHtml', this.onConvertedIntoHtml);
+    ipcRenderer.on('select-directory-reply', this.onDirectorySelected);
   }
 
   componentWillUnmount() {
@@ -60,6 +61,28 @@ class Home extends Component {
       errorMessage
     } = this.state;
 
+    if (!rootPath || rootPath.length === 0) {
+      return (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+          <button
+            className="btn btn-warning btn-block"
+            onClick={this.handlesSelectDirectory}>
+            <span
+              style={{
+                color: '#fff',
+                fontWeight: 'bolder'
+              }}>
+              Select a directory
+            </span>
+          </button>
+        </div>
+      );
+    }
     return (
       <div
         style={{
@@ -284,6 +307,19 @@ class Home extends Component {
     );
   }
 
+  handlesSelectDirectory= (event) => {
+    event.preventDefault();
+    ipcRenderer.send('select-directory');
+  }
+
+  onDirectorySelected = (event, args) => {
+    if (Array.isArray(args) && args.length > 0) {
+      const directory = args[0];
+      console.log('directory: ', directory);
+      this.setState({ rootPath: directory });
+    }
+  }
+
   onConvertedIntoHtml = (event, args) => {
     const listMdFiles = args;
     // stop waiting:
@@ -309,7 +345,7 @@ class Home extends Component {
     const { rootPath } = this.state;
 
     return new Promise((resolve, reject) => {
-      recursive(rootPath, (err, files) => {
+      recursive(path.resolve(rootPath), (err, files) => {
         if (err) {
           return reject(err);
         }

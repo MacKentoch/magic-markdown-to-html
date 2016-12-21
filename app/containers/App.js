@@ -37,8 +37,8 @@ class App extends Component {
     getPersistHistoFiles();
     getUserName();
     // drag and drop over app (other than drag and drop field) should be disabled:
-    this.wrapper.addEventListener('dragover', this.preventEvent);
-    this.wrapper.addEventListener('drop', this.preventEvent);
+    // this.wrapper.addEventListener('dragover', this.preventEvent);
+    // this.wrapper.addEventListener('drop', this.preventEvent);
   }
 
   render() {

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { app, BrowserWindow, Menu, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, Menu, shell, ipcMain, dialog } from 'electron';
 import { githubStyle } from './utils/gihubStyle';
 
 const marked = require('marked');
@@ -56,6 +56,20 @@ ipcMain.on('convertHtml', (event, arg) => {
   }
   // somethings wrong => so returns an empty array:
   event.sender.send('convertedIntoHtml', []);
+});
+
+ipcMain.on('select-directory', (event, args) => {
+  if (!mainWindow) {
+    // mainWindow is not initialized
+    return;
+  }
+  // show dialog: select directory
+  dialog.showOpenDialog(
+    mainWindow,
+    { properties: ['openDirectory'] },
+    (directory) => {
+      event.sender.send('select-directory-reply', directory);
+    });
 });
 
 if (process.env.NODE_ENV === 'production') {
