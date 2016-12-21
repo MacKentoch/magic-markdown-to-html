@@ -356,6 +356,20 @@ class Home extends Component {
               <h2>
                 Done!
               </h2>
+              <button
+                className="btn btn-warning"
+                style={{
+                  marginTop: '30px',
+                  padding: '20px',
+                  paddingLeft: '30px',
+                  paddingRight: '30px'
+                }}
+                onClick={this.handlesReset}>
+                <i
+                  className="fa fa-refresh fa-2x"
+                  aria-hidden="true"
+                />
+              </button>
             </div>
         }
       </div>
@@ -363,7 +377,6 @@ class Home extends Component {
   }
 
   handlesSelectSaveThisDirectory = event => {
-    // event.preventDefault();
     const { saveThisDirectory } = this.state;
     this.setState({ saveThisDirectory: !saveThisDirectory });
   }
@@ -411,6 +424,10 @@ class Home extends Component {
     return false;
   }
 
+  handlesReset = (event) => {
+    event.preventDefault();
+    this.setState({ mdFiles: [] });
+  }
 
   onConvertedIntoHtml = (event, args) => {
     const listMdFiles = args;
