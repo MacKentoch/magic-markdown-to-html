@@ -4,7 +4,7 @@ electron react app based on [electron-react-boilerplate](https://github.com/chen
 
 ## preview
 
-![preview](https://cdn.rawgit.com/MacKentoch/magic-markdown-to-html/ed54874b/preview.gif)
+<img alt="preview" src="./preview.gif" width="400" />
 
 ## Run
 * **Note: requires a node version >= 6 and an npm version >= 3.**
