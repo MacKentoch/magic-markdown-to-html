@@ -5,6 +5,8 @@ electron react app based on [electron-react-boilerplate](https://github.com/chen
 ## Run
 * **Note: requires a node version >= 6 and an npm version >= 3.**
 
+> **IMPORTANT**: ALWAYS use `native terminal` and `not your IDE one` (*like ATOM platform.io*) otherwise you will encounter error: `Cannot read property 'on' of undefined`.
+
 Run these two commands __simultaneously__ in different console tabs.
 
 ```bash
