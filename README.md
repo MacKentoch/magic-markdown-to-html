@@ -2,6 +2,11 @@
 
 electron react app based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
+## preview
+
+![preview](./preview.gif)
+
+
 ## Run
 * **Note: requires a node version >= 6 and an npm version >= 3.**
 
