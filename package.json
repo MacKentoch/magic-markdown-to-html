@@ -161,7 +161,7 @@
     "immutable": "^3.8.1",
     "inline-style-prefixer": "^2.0.5",
     "jquery": "^3.1.1",
-    "marked": "^0.3.6",
+    "marked": "^0.3.18",
     "mssql": "^3.3.0",
     "precss": "^1.4.0",
     "pygmentize-bundled": "^2.3.0",
